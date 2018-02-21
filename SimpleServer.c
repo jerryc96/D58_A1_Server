@@ -19,8 +19,8 @@ struct ReqInfo {
     int             status;
 };
 
-int Return_Resource (int conn, int resource, struct ReqInfo * reqinfo);
-
+int Return_Resource (int conn, int resource, struct ReqInfo *reqinfo);
+void Error_Quit(char const *msg);
 
 void clean_exit(int rc, int fd, char *message){
 	if (rc == -1 || fd == -1){
@@ -33,7 +33,7 @@ void clean_exit(int rc, int fd, char *message){
 }
 
 int main(int argc, char *argv[]){
-	int server_fd, client_fd, client_addr_len, opt;
+	int server_fd, client_fd, rc, client_addr_len, opt;
 	struct sockaddr_in server_addr, client_addr;
 	char client_msg[1024], *server_msg = "Server message, don't connect";
 	// require port to listen to
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]){
 	}
 }
 
-int Return_Resource(int conn, int resource, struct ReqInfo * reqinfo) {
+int Return_Resource(int conn, int resource, struct ReqInfo *reqinfo) {
 
     char c;
     int  i;
@@ -89,4 +89,9 @@ int Return_Resource(int conn, int resource, struct ReqInfo * reqinfo) {
 	    Error_Quit("Error sending file.");
     }
     return 0;
+}
+
+void Error_Quit(char const * msg) {
+    fprintf(stderr, "WEBSERV: %s\n", msg);
+    exit(EXIT_FAILURE);
 }
