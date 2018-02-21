@@ -6,6 +6,22 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+// Data types for headers
+enum Req_Method { GET, HEAD, UNSUPPORTED };
+enum Req_Type   { SIMPLE, FULL };
+
+struct ReqInfo {
+    enum Req_Method method;
+    enum Req_Type   type;
+    char           *referer;
+    char           *useragent;
+    char           *resource;
+    int             status;
+};
+
+int Return_Resource (int conn, int resource, struct ReqInfo * reqinfo);
+
+
 void clean_exit(int rc, int fd, char *message){
 	if (rc == -1 || fd == -1){
 		if (fd != -1){
@@ -59,4 +75,18 @@ int main(int argc, char *argv[]){
 		// close client
 		close(client_fd);
 	}
+}
+
+int Return_Resource(int conn, int resource, struct ReqInfo * reqinfo) {
+
+    char c;
+    int  i;
+
+    while ( (i = read(resource, &c, 1)) ) {
+	if ( i < 0 )
+	    Error_Quit("Error reading from file.");
+	if ( write(conn, &c, 1) < 1 )
+	    Error_Quit("Error sending file.");
+    }
+    return 0;
 }
